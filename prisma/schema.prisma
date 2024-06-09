@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//TABLES
+
+model Board {
+  id Int @id @default(autoincrement())
+  name String @unique @db.VarChar(30)
+  abreviation String @unique @db.VarChar(10)
+  description String @db.VarChar(200)
+  category Category[]
+  allowsNsfw Boolean @default(false)
+
+  threads Thread[]
+}
+
+model Thread {
+    id Int @id @default(autoincrement())
+    board Int
+    creator String @db.VarChar(30)
+    subject String @db.VarChar(50)
+    comment String @db.VarChar(500)
+    tags String[]
+    createDate DateTime @default(now())
+    isSpoiler Boolean @default(false)
+    isNsfw Boolean @default(false)
+    isArchived Boolean @default(false)
+    file Bytes?
+
+    replies Reply[]
+    id_board Board @relation(fields: [board], references: [id])
+}
+
+model Reply {
+    id Int @id @default(autoincrement())
+    thread Int
+    creator String @db.VarChar(30)
+    comment String @db.VarChar(500)
+    createDate DateTime @default(now())
+    isSpoiler Boolean @default(false)
+    isNsfw Boolean @default(false)
+    file Bytes?
+
+    id_thread Thread @relation(fields: [thread], references: [id])
+}
+
+//ENUMS
+
+enum Category {
+  anime
+  chat
+  sports
+  manga
+  comcis
+  random
+  memes
+}
