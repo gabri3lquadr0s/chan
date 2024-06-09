@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { PrismaService } from 'src/db/prisma.service';
@@ -8,7 +8,7 @@ import { Category } from '@prisma/client';
 export class BoardsService {
   constructor(private prisma: PrismaService) {}
 
-  async createBoard(createBoardDto: CreateBoardDto) {
+  async createBoard(createBoardDto: CreateBoardDto, createdBy: number) {
     const { name } = createBoardDto;
     const nameExists = await this.prisma.board.findFirst({
       where: {
@@ -20,6 +20,7 @@ export class BoardsService {
     return this.prisma.board.create({
       data: {
         ...createBoardDto,
+        createdBy,
       },
     });
 
@@ -138,12 +139,18 @@ export class BoardsService {
     return {"response": res, "totalCount": count};
   }
 
-  async updateBoard(id: number, updateBoardDto: UpdateBoardDto) {
+  async updateBoard(id: number, updateBoardDto: UpdateBoardDto, user: number) {
     const board = await this.prisma.board.findUnique({
       where: {
         id,
       }
     });
+
+    if(user != 0) {
+      if(user != board.createdBy) {
+        throw new UnauthorizedException();
+      }
+    }
 
     if(!board) throw new NotFoundException("ERROR: Ong não encontrada");
 
@@ -157,18 +164,24 @@ export class BoardsService {
     });
   }
 
-  async deleteBoard(id: number) {
+  async deleteBoard(id: number, user: number) {
     const board = await this.prisma.board.findUnique({
       where: {
-        id
+        id,
       },
     });
+
+    if(user != 0) {
+      if(user != board.createdBy) {
+        throw new UnauthorizedException();
+      }
+    }
 
     if(!board) throw new NotFoundException("Board not found");
 
     return this.prisma.board.delete({
       where: {
-        id
+        id,
       },
     });
   }

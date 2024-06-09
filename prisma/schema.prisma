@@ -16,38 +16,50 @@ model Board {
   description String @db.VarChar(200)
   category Category[]
   allowsNsfw Boolean @default(false)
+  createdBy Int
 
+  id_user User @relation(fields: [createdBy], references: [id])
   threads Thread[]
 }
 
 model Thread {
-    id Int @id @default(autoincrement())
-    board Int
-    creator String @db.VarChar(30)
-    subject String @db.VarChar(50)
-    comment String @db.VarChar(500)
-    tags String[]
-    createDate DateTime @default(now())
-    isSpoiler Boolean @default(false)
-    isNsfw Boolean @default(false)
-    isArchived Boolean @default(false)
-    file Bytes?
+  id Int @id @default(autoincrement())
+  board Int
+  creator String @db.VarChar(30)
+  subject String @db.VarChar(50)
+  comment String @db.VarChar(500)
+  tags String[]
+  createDate DateTime @default(now()) @db.Date
+  isSpoiler Boolean @default(false)
+  isNsfw Boolean @default(false)
+  isArchived Boolean @default(false)
+  file Bytes?
 
-    replies Reply[]
-    id_board Board @relation(fields: [board], references: [id])
+  replies Reply[]
+  id_board Board @relation(fields: [board], references: [id])
 }
 
 model Reply {
-    id Int @id @default(autoincrement())
-    thread Int
-    creator String @db.VarChar(30)
-    comment String @db.VarChar(500)
-    createDate DateTime @default(now())
-    isSpoiler Boolean @default(false)
-    isNsfw Boolean @default(false)
-    file Bytes?
+  id Int @id @default(autoincrement())
+  thread Int
+  creator String @db.VarChar(30)
+  comment String @db.VarChar(500)
+  createDate DateTime @default(now())
+  isSpoiler Boolean @default(false)
+  isNsfw Boolean @default(false)
+  file Bytes?
 
-    id_thread Thread @relation(fields: [thread], references: [id])
+  id_thread Thread @relation(fields: [thread], references: [id])
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  username String @db.VarChar(30)
+  email String @unique @db.VarChar(70)
+  password String
+  isAdmin Boolean @default(false)
+
+  boards Board[]
 }
 
 //ENUMS

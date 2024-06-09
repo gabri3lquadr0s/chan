@@ -22,10 +22,10 @@ export class CreateThreadDto {
     @IsNotEmpty()
     comment: string;
 
-    @ApiProperty({type: String, description: "Thread tags", example: ["new", "newuser", "hi"]})
+    @ApiProperty({type: Array, description: "Thread tags", example: ["new", "newuser", "hi"]})
     @IsArray()
     @IsNotEmpty()
-    tags: string;
+    tags: string[];
 
     @ApiProperty({type: Boolean, description: "Thread contains spoiler", example: false})
     @IsBoolean()

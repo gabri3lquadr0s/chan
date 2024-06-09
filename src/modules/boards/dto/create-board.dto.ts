@@ -23,12 +23,12 @@ export class CreateBoardDto {
     @IsNotEmpty()
     description: string;
 
-    @ApiProperty({type: String, description: "Categories that the board fits", example: ["chat", "anime"]})
+    @ApiProperty({type: Array, description: "Categories that the board fits", example: ["chat", "anime"]})
     @IsArray()
     @IsNotEmpty()
     category: Category[];
 
-    @ApiProperty({type: String, description: "If the board allows nsfw content or not", example: false})
+    @ApiProperty({type: Boolean, description: "If the board allows nsfw content or not", example: false})
     @IsBoolean()
     @IsNotEmpty()
     allowsNsfw: boolean;
